@@ -1,0 +1,33 @@
+#Install the devtools package then github packages
+install.packages("devtools")
+install.packages("Rcpp")
+library(devtools)
+install_github("petermeissner/wikipediatrend")
+install_github("twitter/AnomalyDetection")
+
+#Loading the libraries
+library(Rcpp)
+library(wikipediatrend)
+library(AnomalyDetection)
+
+# Download wikipedia webpage "fifa"
+fifa_data_wikipedia = wp_trend("fifa", from="2013-03-18", lang = "en")
+
+#First_look
+fifa_data_wikipedia
+
+# Plotting data
+library(ggplot2)
+ggplot(fifa_data_wikipedia, aes(x=date, y=views, color=views)) + geom_line()
+
+# Keep only date & page views and discard all other variables
+columns_to_keep=c("date","views")
+fifa_data_wikipedia=fifa_data_wikipedia[,columns_to_keep]
+
+#Apply anomaly detection and plot the results
+anomalies = AnomalyDetectionTs(fifa_data_wikipedia, direction="pos", plot=TRUE)
+
+anomalies$plot
+
+# Look at the anomaly dates
+anomalies$anoms
